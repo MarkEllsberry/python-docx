@@ -60,6 +60,17 @@ class DocumentPart(BaseStoryPart):
         return self.related_parts[rId]
 
     def get_style(self, style_id, style_type):
+    def add_list(self, style=None, level=0):
+        """
+        Return a helper that provides methods to add paragraphs to the end of
+        the body content, grouped together as a list. The paragraphs will by
+        default have their paragraph style set to *style*, and their indentation
+        level set to *level*.
+        """
+        return self.body.add_list(style=style, level=level)
+
+    @lazyproperty
+    def body(self):
         """
         Return the style in this document matching *style_id*. Returns the
         default style for *style_type* if *style_id* is |None| or does not
@@ -104,6 +115,18 @@ class DocumentPart(BaseStoryPart):
             return numbering_part
 
     def save(self, path_or_stream):
+    @property
+    def lists(self):
+        """
+        A list of |ListParagraph| instances corresponding to lists formed by
+        paragraphs sharing the same numId in the document, in document order.
+        Note that list paragraphs within revision marks such as inserted or
+        deleted do not appear in this list.
+        """
+        return self.body.lists
+
+    @lazyproperty
+    def sections(self):
         """
         Save this document to *path_or_stream*, which can be either a path to
         a filesystem location (a string) or a file-like object.
